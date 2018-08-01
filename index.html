@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <title>Contador de calorías</title>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div class="nav-wrapper blue">
+            <div class="container">
+                <a href="#" class="brend-logo">Contador de calorías</a>
+                <ul class="right">
+                    <li><a href="#" class="clear-btn btn blue lighten-3">Borrar Todo</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <br>
+
+    <div class="container">
+        <!-- Formulario -->
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Añadir comida / alimento</span>
+                <form class="col">
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <input type="text" placeholder="Añadir comida" name="comida" id="item-name">
+                            <label for="comida">Comida</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input type="text" placeholder="Añadir calorías" name="calorías" id="item-calories">
+                            <label for="calorías">Calorías</label>
+                        </div>
+                        <button class="add-btn btn blue darken-3"><i class="fa fa-plus"></i> Añadir comida</button>
+                        <!-- <button class="update-btn btn orange"><i class="fa fa-pencil-square-o"></i> Editar comida</button>
+                        <button class="delete-btn btn red"><i class="fa fa-remove"></i> Eliminar comida</button> -->
+                        <button class="back-btn btn grey pull-right"><i class="fa fa-chevron-circle-left"></i> Atrás</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Contador calorías -->
+        <h3 class="center-align">Calorías Totales: <span class="total-calories">0</span></h3>
+
+        <!-- Listado de artículos -->
+        <ul id="item-lis" class="collection">
+            <li class="collection-item" id="item-0">
+                <strong>Entrecot: </strong> <em>1000 calorías</em>
+                <a href="#" class="secondary-content"><i class="fa fa-pencil"></i></a>
+            </li>
+        </ul>
+    </div>
+
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
+</body>
+</html>
