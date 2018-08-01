@@ -35,7 +35,7 @@
                             <label for="comida">Comida</label>
                         </div>
                         <div class="input-field col s6">
-                            <input type="text" placeholder="Añadir calorías" name="calorías" id="item-calories">
+                            <input type="number" placeholder="Añadir calorías" name="calorías" id="item-calories">
                             <label for="calorías">Calorías</label>
                         </div>
                         <button class="add-btn btn blue darken-3"><i class="fa fa-plus"></i> Añadir comida</button>
@@ -50,16 +50,15 @@
         <h3 class="center-align">Calorías Totales: <span class="total-calories">0</span></h3>
 
         <!-- Listado de artículos -->
-        <ul id="item-lis" class="collection">
-            <li class="collection-item" id="item-0">
+        <ul id="item-list" class="collection">
+            <!-- <li class="collection-item" id="item-0">
                 <strong>Entrecot: </strong> <em>1000 calorías</em>
                 <a href="#" class="secondary-content"><i class="fa fa-pencil"></i></a>
-            </li>
+            </li> -->
         </ul>
     </div>
-
-
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
