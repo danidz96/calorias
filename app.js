@@ -60,6 +60,19 @@ const ItemCtrl = (() => {
             return found;
         },
 
+        deleteItem: id => {
+            // Obtener ids
+            const ids = data.items.map(function(item){
+              return item.id;
+            });
+      
+            // Obtener index
+            const index = ids.indexOf(id);
+      
+            // Eliminar item
+            data.items.splice(index, 1);
+          },
+
         updateItem: (name, calories) => {
             // Calorías a número
             calories = parseInt(calories);
@@ -154,7 +167,6 @@ const UICtrl = (() => {
         },
 
         addListItem: item => {
-
             // Mostrar lista cuando existe algún item
             document.querySelector(UISelectors.itemList).style.visibility = 'visible';
             
@@ -188,6 +200,13 @@ const UICtrl = (() => {
                     document.querySelector(`#${itemID}`).innerHTML = html;
                 }
             });
+        },
+
+        // Eliminar item del ui
+        deleteListItem: id => {
+            const itemID = `#item-${id}`;
+            const item = document.querySelector(itemID);
+            item.remove();
         },
 
         clearInputs: () => {
@@ -241,8 +260,12 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
         // Evento para el botón de editar (hay que usar event delegation porque es un elemento que no esta creado desde el principio)
         document.querySelector(UISelectors.itemList).addEventListener('click', itemEditClick);
 
-        // Añadir eveto para actualizar el item
+        // Evento para actualizar el item
         document.querySelector(UISelectors.updateBtn).addEventListener('click', itemUpdateSubmit);
+
+        // Evento para eliminar item
+        document.querySelector(UISelectors.deleteBtn).addEventListener('click', itemDeleteSubmit);
+        
     }
 
     const itemAddSubmit = e => {
@@ -267,9 +290,7 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
 
             // Limpiar campos del formulario
             UICtrl.clearInputs();
-        }
-
-        
+        }        
     }
 
     // Click editar item
@@ -318,7 +339,27 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
 
         UICtrl.clearEditState();
 
-        
+    }
+
+    // Eliminar item
+    const itemDeleteSubmit = e => {
+        e.preventDefault();
+        // Obtener item actual
+        const currentItem = ItemCtrl.getCurrentItem();
+
+        // Eliminar de los datos
+        ItemCtrl.deleteItem(currentItem.id);
+
+        // Eliminar item del UI
+        UICtrl.deleteListItem(currentItem.id);
+
+        // Obtener total de calorías
+        const totalCalories = ItemCtrl.getTotalCalories();
+
+        // Añadir total de calorías a la UI
+        UICtrl.showTotalCalories(totalCalories);
+
+        UICtrl.clearEditState();
 
     }
 
