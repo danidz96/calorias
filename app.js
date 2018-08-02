@@ -47,8 +47,30 @@ const ItemCtrl = (() => {
             return newItem;
         },
 
+        getItemById: id => {
+            let found = null;
+
+            // Loop items
+            data.items.forEach(item => {
+                if (item.id === id) {
+                    found = item;
+                }
+            });
+
+            return found;
+        },
+
+        setCurrentItem: item => {
+            data.currentItem = item
+        },
+
+        getCurrentItem: () => {
+            return data.currentItem;
+        },
+
         logdata: () => data,
 
+        // Calcular total de calorías
         getTotalCalories: () => {
             let total = 0;
 
@@ -71,6 +93,9 @@ const UICtrl = (() => {
     const UISelectors = {
         itemList: '#item-list',
         addBtn: '.add-btn',
+        updateBtn: '.update-btn',
+        deleteBtn: '.delete-btn',
+        backBtn: '.back-btn',
         itemNameInput: '#item-name',
         itemCaloriesInput: '#item-calories',
         totalCalories: '.total-calories'
@@ -131,7 +156,28 @@ const UICtrl = (() => {
             document.querySelector(UISelectors.itemCaloriesInput).value = '';
         }, 
 
-        showTotalCalories: totalCalories => document.querySelector(UISelectors.totalCalories).textContent = totalCalories
+        showTotalCalories: totalCalories => document.querySelector(UISelectors.totalCalories).textContent = totalCalories,
+
+        clearEditState: () => {
+            UICtrl.clearInputs();
+            document.querySelector(UISelectors.updateBtn).style.display = 'none';
+            document.querySelector(UISelectors.deleteBtn).style.display = 'none';
+            document.querySelector(UISelectors.backBtn).style.display = 'none';
+            document.querySelector(UISelectors.addBtn).style.display = 'inline';
+        },
+
+        showEditState: () => {
+            document.querySelector(UISelectors.updateBtn).style.display = 'inline';
+            document.querySelector(UISelectors.deleteBtn).style.display = 'inline';
+            document.querySelector(UISelectors.backBtn).style.display = 'inline';
+            document.querySelector(UISelectors.addBtn).style.display = 'none';
+        },
+
+        addItemToForm: () => {
+            document.querySelector(UISelectors.itemNameInput).value = ItemCtrl.getCurrentItem().name;
+            document.querySelector(UISelectors.itemCaloriesInput).value = ItemCtrl.getCurrentItem().calories;
+            UICtrl.showEditState();
+        }
     }
 })();
 
@@ -144,6 +190,9 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
 
         // Añadir evento a los items
         document.querySelector(UISelectors.addBtn).addEventListener('click', itemAddSubmit);
+
+        // Evento para el botón de editar (hay que usar event delegation porque es un elemento que no esta creado des de el principio)
+        document.querySelector(UISelectors.itemList).addEventListener('click', itemUpdateSubmit);
     }
 
     const itemAddSubmit = e => {
@@ -173,9 +222,37 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
         
     }
 
+    // Actualizar submit
+    const itemUpdateSubmit = e => {
+        e.preventDefault();
+
+        if (e.target.classList.contains('edit-item')) {
+            // Obtener la id del item
+            const listId = e.target.parentNode.parentNode.id;
+
+            // Separar en array
+            const listIdArr = listId.split('-');
+
+            // Obtener el id actual
+            const id = parseInt(listIdArr[1]);
+
+            // Obtener el item
+            const itemToEdit = ItemCtrl.getItemById(id);
+
+            // Set el item actual
+            ItemCtrl.setCurrentItem(itemToEdit);
+
+            // Añadir item al formulario
+            UICtrl.addItemToForm();
+        }
+    }
+
     // Métodos públicos
     return {
         init: () => {
+            // Ocultar botones edición
+            UICtrl.clearEditState();
+
             // Buscar items de la estructura de datos
             const items = ItemCtrl.getItems();
 
