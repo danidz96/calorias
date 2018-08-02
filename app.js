@@ -60,6 +60,24 @@ const ItemCtrl = (() => {
             return found;
         },
 
+        updateItem: (name, calories) => {
+            // Calorías a número
+            calories = parseInt(calories);
+
+            let found = null;
+
+            data.items.forEach(item => {
+                if (item.id === data.currentItem.id) {
+                    item.name = name;
+                    item.calories = calories;
+
+                    found = item;
+                }
+            });
+
+            return found;
+        },
+
         setCurrentItem: item => {
             data.currentItem = item
         },
@@ -92,6 +110,7 @@ const ItemCtrl = (() => {
 const UICtrl = (() => {
     const UISelectors = {
         itemList: '#item-list',
+        listItems: '#item-list li',
         addBtn: '.add-btn',
         updateBtn: '.update-btn',
         deleteBtn: '.delete-btn',
@@ -151,6 +170,26 @@ const UICtrl = (() => {
 
         },
 
+        updateListItem: item => {
+            // Obtener todos los li de la lista
+            let listItems = document.querySelectorAll(UISelectors.listItems);
+
+            // Convertir Node list a un Array
+            listItems = Array.from(listItems);
+
+            listItems.forEach(listItem => {
+                const itemID = listItem.getAttribute('id');
+
+                if (itemID === `item-${item.id}`) {
+                    let html = `
+                        <strong>${item.name}: </strong> <em>${item.calories} calorías</em>
+                        <a href="#" class="secondary-content"><i class="edit-item fa fa-pencil"></i></a>
+                    `;
+                    document.querySelector(`#${itemID}`).innerHTML = html;
+                }
+            });
+        },
+
         clearInputs: () => {
             document.querySelector(UISelectors.itemNameInput).value = '';
             document.querySelector(UISelectors.itemCaloriesInput).value = '';
@@ -191,8 +230,19 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
         // Añadir evento a los items
         document.querySelector(UISelectors.addBtn).addEventListener('click', itemAddSubmit);
 
-        // Evento para el botón de editar (hay que usar event delegation porque es un elemento que no esta creado des de el principio)
-        document.querySelector(UISelectors.itemList).addEventListener('click', itemUpdateSubmit);
+        // Desactivar enter al submit
+        document.addEventListener('keypress', e => {
+            if (e.keyCode === 13 || e.which ===13) {
+                e.preventDefault(); 
+                return false;
+            }
+        })
+
+        // Evento para el botón de editar (hay que usar event delegation porque es un elemento que no esta creado desde el principio)
+        document.querySelector(UISelectors.itemList).addEventListener('click', itemEditClick);
+
+        // Añadir eveto para actualizar el item
+        document.querySelector(UISelectors.updateBtn).addEventListener('click', itemUpdateSubmit);
     }
 
     const itemAddSubmit = e => {
@@ -222,8 +272,8 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
         
     }
 
-    // Actualizar submit
-    const itemUpdateSubmit = e => {
+    // Click editar item
+    const itemEditClick = e => {
         e.preventDefault();
 
         if (e.target.classList.contains('edit-item')) {
@@ -245,6 +295,31 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
             // Añadir item al formulario
             UICtrl.addItemToForm();
         }
+    }
+
+    // Actualizar item
+    const itemUpdateSubmit = e => {
+        e.preventDefault();
+
+        // Obtener item input
+        const input = UICtrl.getItemInput();
+
+        // Actualizar item
+        const updatedItem = ItemCtrl.updateItem(input.name, input.calories);
+
+        // Actualizar la UI
+        UICtrl.updateListItem(updatedItem);
+
+        // Obtener las calorías totales
+        const totalCalories = ItemCtrl.getTotalCalories();
+
+        // Añadir el total de calorías a la UI
+        UICtrl.showTotalCalories(totalCalories);
+
+        UICtrl.clearEditState();
+
+        
+
     }
 
     // Métodos públicos
