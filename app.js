@@ -1,4 +1,74 @@
-// Controlador almacenamiento - TODO
+// Controlador almacenamiento
+const StorageCtrl = (() => {
+    // Métodos públicos
+    return {
+        storeItem: item => {
+            let items;
+            // Comprobar si hay algún item en localStorage
+            if (localStorage.getItem('items') === null) {
+                items = [];
+
+                // Push un nuevo item
+                items.push(item)
+
+                // Establecer localStorage
+                localStorage.setItem('items', JSON.stringify(items));
+
+            } else {
+                items = JSON.parse(localStorage.getItem('items'));
+
+                // Añadir el nuevo item
+                items.push(item);
+
+                // Establecer localStorage
+                localStorage.setItem('items', JSON.stringify(items));
+            }
+        },
+
+        // Obtener items del localStorage
+        getItemsFromStorage: () => {
+            let items;
+            if (localStorage.getItem('items' === null)) {
+                items = [];
+            } else {
+                items = JSON.parse(localStorage.getItem('items'));
+            }
+            return items;
+        },
+
+        // Actualizar item en el localStorage
+        updateItemStorage: updatedItem => {
+            let items = JSON.parse(localStorage.getItem('items'));
+
+            items.forEach((item, index) => {
+                if (updatedItem.id === item.id) {
+                    items.splice(index, 1, updatedItem);
+                }
+            });
+
+            // Establecer localStorage
+            localStorage.setItem('items', JSON.stringify(items));
+        },
+
+        // Eliminar item del localStorage
+        deleteItemFromStorage: id => {
+            let items = JSON.parse(localStorage.getItem('items'));
+
+            items.forEach((item, index) => {
+                if (id === item.id) {
+                    items.splice(index, 1);
+                }
+            });
+
+            // Establecer localStorage
+            localStorage.setItem('items', JSON.stringify(items));
+        },
+
+        clearAllFromStorage: () => {
+            localStorage.removeItem('items');
+        }
+    }
+})();
 
 // Controlador de items
 const ItemCtrl = (() => {
@@ -12,11 +82,7 @@ const ItemCtrl = (() => {
 
     // Estructura de los datos
     const data = {
-        items: [
-            // {id: 0, name: 'Entrecot', calories: 1200},
-            // {id: 1, name: 'Galleta', calories: 400},
-            // {id: 2, name: 'Huevos', calories: 300}
-        ],
+        items: StorageCtrl.getItemsFromStorage(),
         currentItem: null,
         totalCalories: 0
     }
@@ -252,12 +318,19 @@ const UICtrl = (() => {
             document.querySelector(UISelectors.itemNameInput).value = ItemCtrl.getCurrentItem().name;
             document.querySelector(UISelectors.itemCaloriesInput).value = ItemCtrl.getCurrentItem().calories;
             UICtrl.showEditState();
+        }, 
+
+        backButtonClick: () => {
+            document.querySelector(UISelectors.updateBtn).style.display = 'none';
+            document.querySelector(UISelectors.deleteBtn).style.display = 'none';
+            document.querySelector(UISelectors.backBtn).style.display = 'none';
+            document.querySelector(UISelectors.addBtn).style.display = 'inline';
         }
     }
 })();
 
 // Controlador de la aplicación
-const AppCtrl = ((ItemCtrl, UICtrl) => {
+const AppCtrl = ((ItemCtrl, StorageCtrl, UICtrl) => {
     // Cargar event listeners
     const loadEventListeners = () => {
         // Devolver selectores UI
@@ -285,6 +358,9 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
 
         // Evento para limpiar los items
         document.querySelector(UISelectors.clearBtn).addEventListener('click', clearAllItemsClick);
+
+        // Evento para el botón atrás
+        document.querySelector(UISelectors.backBtn).addEventListener('click', UICtrl.backButtonClick);
         
     }
 
@@ -307,6 +383,9 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
 
             // Añadir el total de calorías a la UI
             UICtrl.showTotalCalories(totalCalories);
+
+            // Guardar en localStorage
+            StorageCtrl.storeItem(newItem);
 
             // Limpiar campos del formulario
             UICtrl.clearInputs();
@@ -354,6 +433,9 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
         // Obtener las calorías totales
         const totalCalories = ItemCtrl.getTotalCalories();
 
+        // Actualizar el localStorage
+        StorageCtrl.updateItemStorage(updatedItem);
+
         // Añadir el total de calorías a la UI
         UICtrl.showTotalCalories(totalCalories);
 
@@ -379,6 +461,9 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
         // Añadir total de calorías a la UI
         UICtrl.showTotalCalories(totalCalories);
 
+        // Eliminar del localstorage
+        StorageCtrl.deleteItemFromStorage(currentItem.id);
+
         UICtrl.clearEditState();
 
     }
@@ -395,6 +480,9 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
 
         // Añadir total de calorías a la UI
         UICtrl.showTotalCalories(totalCalories);
+
+        // Eliminar todos los items del localStorage
+        StorageCtrl.clearAllFromStorage();
 
         UICtrl.hideList();
     }
@@ -427,7 +515,7 @@ const AppCtrl = ((ItemCtrl, UICtrl) => {
         }
     }
 
-})(ItemCtrl, UICtrl);
+})(ItemCtrl, StorageCtrl, UICtrl);
 
 // Iniciar app
 AppCtrl.init();
